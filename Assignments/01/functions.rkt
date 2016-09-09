@@ -3,7 +3,7 @@
 #reader(lib "htdp-beginner-reader.ss" "lang")((modname functions) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
 ;; Singles, Doubles, Triples, Home Runs, At Bats
 (define (batter-slugging-average s d t hr ab)
-  (/ (+ 2 (* 2 d) (* 3 t) (* 4 hr )) ab))
+  (/ (+ s (* 2 d) (* 3 t) (* 4 hr )) ab))
 
 ;; 33,000 ftlb's of work per minute. 1 Horsepower.
 (define hpc 33000)
@@ -14,5 +14,5 @@
   (+ (+ (- (* a (sqr x)) (* 2 a h)) (* a (sqr h))) k))
 
 (define (future-value n p r t)
-  (* p (expt (+ 1 (/ r n) (* n t)))))
+  (* p (expt (+ 1 (/ r n)) (* n t))))
 
