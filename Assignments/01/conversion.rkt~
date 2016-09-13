@@ -6,31 +6,17 @@
 (define smoot 1.7018)
 (define fathomperm 0.546807)
 (define nc 3.15576)
-(define seconds 60)
-(define minutes 60)
-(define fortnight 14)
-(define hours 24)
-
-
 (define (m/s->mph ms)
-  (/ ms
-     (/ mile minutes seconds)))
-
+  (/ ms (/ mile 60 60)))
 
 (define (mph->m/s mph)
-  (* mph
-     (/ mile minutes seconds)))
-
+  (* mph (/ mile 60 60)))
 
 (define (fph->m/s fph)
-  (* fph
-     (/ fathom minutes seconds)))
-
+  (* fph (/ fathom 60 60)))
 
 (define (fpf->mph fpf)
-  (m/s->mph
-   (fph->m/s (/ fpf fortnight hours))))
-
+  (m/s->mph (fph->m/s (/ fpf 14 24))))
 
 (define (mph->S/nc mph)
   (/ (* (mph->m/s mph) nc) smoot))
