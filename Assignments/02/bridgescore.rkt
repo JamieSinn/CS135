@@ -66,7 +66,7 @@
 ;; (penalty-points underticks vuln doubled redoubled) produces the penalty points for not meeting a contract
 ;; penalty-points: Num Bool Bool Bool -> Num
 ;; Examples:
-(check-expect (penalty-points 4 false false false) -50)
+(check-expect (penalty-points 4 false false false) -200)
 (check-expect (penalty-points 1 true true false) -200)
 (check-expect (penalty-points 2 true false false) -200)
 (check-expect (penalty-points 3 false true false) -500)
@@ -148,6 +148,80 @@
 
 ;; QUESTION 2. C
 
-(define (deuplicate-score level suit result vuln doubled redoubled)
-  ...)
-  
+(define (duplicate-score level suit result vuln doubled redoubled)
+  (cond
+    [(< result 0)
+     (penalty-points level vuln doubled redoubled)
+     ]
+    [else
+     (+ (contract-points level suit doubled redoubled)
+        (game-bonus (contract-points level suit doubled redoubled) vuln)
+        (insult-bonus doubled redoubled)
+        (overtrick-bonus suit vuln doubled redoubled)
+        )
+     ]
+    )
+  )
+(check-expect (duplicate-score 3 'NT 4 false true false) 650)
+
+(define (game-bonus contract-points vuln)
+  (cond
+    [(< contract-points 100)
+     50
+     ]
+    [(and (>= contract-points 100) (not vuln))
+     300
+     ]
+    [(and (>= contract-points 100) vuln)
+     500
+     ]
+    [else 0]
+    )
+  )
+
+(define (insult-bonus doubled redoubled)
+  (cond
+    [(and doubled redoubled)
+     100
+     ]
+    [(and doubled (not redoubled))
+     50
+     ]
+    [else 0]
+    )
+  )
+(define (overtrick-bonus suit vuln doubled redoubled)
+  (cond
+    [(and (not doubled) (not redoubled))
+     (cond
+       [(major? suit)
+        30
+        ]
+       [(minor? suit)
+        20
+        ]
+       [else 30]
+       )
+     ]
+    [(and doubled redoubled)
+     (cond
+       [vuln
+        400
+        ]
+       [else 200]
+       )
+     ]
+    [(and doubled (not redoubled))
+     (cond
+       [vuln
+        200
+        ]
+       [else 100]
+       )
+     ]
+    )
+  )
+
+
+
+
