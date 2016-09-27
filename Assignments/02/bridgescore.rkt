@@ -149,4 +149,5 @@
 ;; QUESTION 2. C
 
 (define (deuplicate-score level suit result vuln doubled redoubled)
+  ...)
   
