@@ -9,6 +9,7 @@
 ;; ---------------------------
 ;;
 
+(define max-distance 182)
 ;; (count-less-than listofnum totest) produces the amount of numbers in listofnum that are less than totest.
 ;; count-less-than (listof Num) Num -> Int
 ;; Examples:
@@ -30,22 +31,24 @@
 (check-expect (end-points empty empty) 0)
 (check-expect (end-points (cons 15 (cons 25 (cons 35 empty))) (cons 15 (cons 25 (cons 35 empty)))) 0)
 (check-expect (end-points (cons 188 (cons 190 (cons 200 empty))) (cons 180 (cons 185 empty))) -1)
+(check-expect (end-points (cons 188 (cons 190 (cons 200 empty))) (cons 184 (cons 185 empty))) 0)
 
 (define (end-points team1 team2)
   (cond
-    [(or (empty? team1) (empty? team2)) 0]
+    [(and (empty? team1) (empty? team2)) 0]
     [(= (all-greater (first team1) team2) 1) (+ 1 (all-greater (first (rest team1)) team2))]
     [(= (all-greater (first team2) team1) 1) (- 0 1 (all-greater (first (rest team2)) team1))]
     [else 0]))
 
 ;; (all-greater totest list) produces a 1 if list contains only numbers greater than totest
-;;   and produces a 0 otherwise.
+;;   and produces a 0 otherwise. It also handles checking if totest is greater than the allowed distance.
 ;; all-greater: Num (listof Num) -> Num
 ;; Examples
 (check-expect (all-greater 1 (cons 3 (cons 4 (cons 5 empty)))) 1)
 
 (define (all-greater totest list)
   (cond
+    [(> totest max-distance) 0]
     [(empty? list) 1]
     [(< totest (first list)) (all-greater totest (rest list))]
     [else 0]))
