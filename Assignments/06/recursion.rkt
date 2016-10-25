@@ -54,6 +54,7 @@
 (check-expect (is-contained? (list "a" 2 4 2) (list 4 "a" 2 5)) true)
 (check-expect (is-contained? empty (list "wow")) true)
 (check-expect (is-contained? (list 1 2) (list 3 2 'red)) false)
+(check-expect (is-contained? empty (list 4 "a" 2 5)) true)
 
 (define (is-contained? list1 list2)
   (cond
@@ -72,6 +73,7 @@
 ;; Examples
 (check-expect (digits->nat (list 3 0 1 9 5)) 59103)
 (check-expect (digits->nat (list 1 2 0 0 0)) 21)
+(check-expect (digits->nat empty) 0)
 
 (define (digits->nat digits)
   (cond

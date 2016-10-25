@@ -1,6 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname matrix) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+#reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname bonus) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
 ;;
 ;; ---------------------------
 ;;  James Sinn (20654551)
@@ -8,6 +8,7 @@
 ;;  Assignment 6. 
 ;; ---------------------------
 ;;
+
 
 ;; Testing Matricies.
 (define M (list (list -1 2 3) (list 4 5 6) (list 7 8.5 9)))
@@ -80,3 +81,37 @@
   (cond
     [(> n max) empty]
     [else (list* (get-col n matrix) (transpose-main matrix (+ n 1) max))]))
+
+(define r1 (list (list 1)))
+(define r2 (list (list 1 0) (list 0 1)))
+(define r3 (list (list 1 0 0) (list 0 1 0) (list 0 0 1)))
+(define r4 (list (list 1 0 0 0) (list 0 1 0 0) (list 0 0 1 0) (list 0 0 0 1)))
+
+(define (orthogonal? matrix)
+  (cond
+    [(equal? (multiplymatrix matrix (transpose matrix)) (ident (length (first matrix)))) true]
+    [else false]))
+
+
+(check-expect (orthogonal? r3) true)
+
+
+(define (multiplymatrix m1 m2)
+  (cond
+    [(empty? m1) empty]
+    [else (list* (list (row-mult (first (first m1)) (first m2))
+                       (row-mult (second (first m1)) (first m2))
+                       (row-mult (third (first m1)) (first m2)))
+                 (multiplymatrix (rest m1) (rest m2)))]))
+
+(define (row-mult n listn)
+  (cond
+    [(empty? listn) 0]
+    [else (+ (* n (first listn)) (row-mult n (rest listn)))]))
+
+(define (ident len)
+  (cond
+    [(= len 1) r1]
+    [(= len 2) r2]
+    [(= len 3) r3]
+    [(= len 4) r4]))
