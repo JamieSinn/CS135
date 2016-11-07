@@ -89,7 +89,7 @@
 
 (define (orthogonal? matrix)
   (cond
-    [(equal? (multiplymatrix matrix (transpose matrix)) (ident (length (first matrix)))) true]
+    [(equal? (multiplymatrix matrix (transpose matrix)) (multiplymatrix (multiplymatrix matrix (transpose matrix)) (multiplymatrix matrix (transpose matrix))))  true]
     [else false]))
 
 
@@ -99,6 +99,11 @@
 (define (multiplymatrix m1 m2)
   (cond
     [(empty? m1) empty]
+    [(= (length (first m1)) 1) (list* (list (row-mult (first (first m1)) (first m2))))]
+    [(= (length (first m1)) 2) (list* (list (row-mult (first (first m1)) (first m2))
+                                                (row-mult (second (first m1)) (first m2))))]
+    [(= (length (first m1)) 2) (list* (list (row-mult (first (first m1)) (first m2))
+                                                (row-mult (second (first m1)) (first m2))))]
     [else (list* (list (row-mult (first (first m1)) (first m2))
                        (row-mult (second (first m1)) (first m2))
                        (row-mult (third (first m1)) (first m2)))
