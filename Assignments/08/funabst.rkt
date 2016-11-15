@@ -128,5 +128,5 @@
 (check-expect (evaluate '(* y 4) '((x 5) (y 7))) 28)
 (check-expect (evaluate '(+ 1 2) empty) 3)
 
-;; (arranged 
+;; (arranged _list oper) produces true if the list of oper 
 ;; arranged?: (list(Any -> Bool) (X X -> Bool)) (listof Any) -> Bool
