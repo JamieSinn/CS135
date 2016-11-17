@@ -19,6 +19,8 @@
 (define (and-pred func _list)
   (local
     [
+     ;; (check-v s) produces the result of applying func to a given value)
+     ;; check-v: Any -> Any
      (define (check-v s)
        (func s))]
     (cond
@@ -40,7 +42,6 @@
 (check-expect (map2argfn (list + - * / list) '(3 2)) '(5 1 6 1.5 (3 2)))
 
 (define (map2argfn funcs _list)
-  
   (cond
     [(empty? funcs) empty]
     [else
@@ -91,7 +92,7 @@
             [(symbol=? (first exp) '+) (list* '+ (remap-express (rest exp) _list))]
             [else (list* (getvar (first exp) _list) (remap-express (rest exp) _list))])]
          [else (list* (first exp) (remap-express (rest exp) _list))]))
-
+     
      ;; (getvar var _list) produces the variable with symbol var in the AL _list
      ;; getvar: Sym AL -> Num)
      ;; Requires: var must be in _list
@@ -99,7 +100,7 @@
        (cond
          [(symbol=? var (first (first _list))) (first (rest (first _list)))]
          [else (getvar var (rest _list))]))
-
+     
      ;; (_apply _list func) produces the result of the list _list having all elements
      ;;   of _list with function func applied to them.
      ;; _apply: (listof Num) (Num ... Num -> Num) -> Num
@@ -116,7 +117,7 @@
               [(symbol=? func '*) 1]
               [(symbol=? func '+) 0])]
            [else (toapply (first _list) (_apply (rest _list) func))])))
-
+     
      ;; remapped is the DRY of the remapped values.
      (define remapped (remap-express exp _list))
      ]
@@ -128,5 +129,63 @@
 (check-expect (evaluate '(* y 4) '((x 5) (y 7))) 28)
 (check-expect (evaluate '(+ 1 2) empty) 3)
 
-;; (arranged _list oper) produces true if the list of oper 
+;; (arranged _list oper) produces true if the list of oper is one of the following;
+;;     empty, has one element and the predicate on it returns true.
+;;     
 ;; arranged?: (list(Any -> Bool) (X X -> Bool)) (listof Any) -> Bool
+;; Examples
+(check-expect (arranged? (list string? >) (list "Wow" 'red)) false)
+
+(define (arranged? _list oper)
+  (local
+    [
+     ;; (predcheck _list oper) returns true when oper is empty, or has
+     ;;    one argument and the predicate applied returns true. Otherwise false.
+     ;; predcheck: (list(Any -> Bool) (X X -> Bool)) (listof Any) -> Bool
+     (define (predcheck _list oper)
+       (local
+         [(define func (first _list))]
+         (cond
+           [(empty? oper) true]
+           [(and (= (length oper) 1) (func (first oper))) true]
+           [else false])))
+
+     ;; andcheck: (list(Any -> Bool) (X X -> Bool)) (listof Any) -> Bool
+     (define (andcheck _list oper)
+       (local
+         [(define func (first _list))]
+         (cond
+           [(empty? oper) true]
+           [(func (first oper)) (andcheck _list (rest oper))]
+           [else false])))
+     ;; (binoptcheck _list oper) produces the result of applying the
+     ;; binoptcheck: (list(Any -> Bool) (X X -> Bool)) (listof Any) -> Bool
+     (define (binoptcheck _list oper)
+       (local
+         [(define predicate (first _list))
+          (define binopt (second _list))]
+         (cond
+           [(empty? oper) true]
+           [(and (predicate (first oper)) (binoptcheck _list (rest oper)))
+            (local
+              [
+               ;; (checkbinopt _list oper) produces the result of applying binopt onto
+               ;;    all elements of oper
+               ;; checkbinopt: (list(Any -> Bool) (X X -> Bool)) (listof Any) -> Bool
+               (define (checkbinopt _list oper)
+                 (cond
+                   [(empty? oper) true]
+                   [(not (empty? (second oper)))
+                    (and (binopt (first oper) (second oper)) (checkbinopt _list (rest oper)))]
+                   [else true]))]
+              (checkbinopt _list oper))]
+           [else false])))]
+    (or (predcheck _list oper) (andcheck _list oper) (binoptcheck _list oper))))
+
+;; Tests
+
+(check-expect (arranged? (list integer? <) (list)) true)
+(check-expect (arranged? (list integer? >) (list 1)) true)
+(check-expect (arranged? (list integer? >)(list 'red)) false)
+(check-expect (arranged? (list string? string>?)(list "wow" "cs135" "amazing")) true)
+(check-expect (arranged? (list symbol? symbol=?) '(hagrid)) true)
